@@ -34,14 +34,14 @@ public class AuthenticationService {
   }
 
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    authenticationManager.authenticate(
+    final String email = request.getEmail();
+    Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
             request.getEmail(),
             request.getPassword()
         )
     );
-    var user = repository.findByEmail(request.getEmail())
-        .orElseThrow();
+    var user = (User) authentication.getPrincipal();
     var jwtToken = jwtService.generateToken(user);
     return AuthenticationResponse.builder()
         .token(jwtToken)
