@@ -27,10 +27,12 @@ public class JwtService {
     return claimsResolver.apply(claims);
   }
 
+  //generating token without extraclaims
   public String generateToken(UserDetails userDetails) {
     return generateToken(new HashMap<>(), userDetails);
   }
 
+//generating token with extraclaims
   public String generateToken(
       Map<String, Object> extraClaims,
       UserDetails userDetails
