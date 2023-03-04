@@ -29,4 +29,4 @@ To build and run the project, follow these steps:
 * Build the project: mvn clean install
 * Run the project: mvn spring-boot:run 
 
--> The application will be available at http://localhost:8080.
+-> The application will be available at `http://localhost:8080`.
