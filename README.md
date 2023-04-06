@@ -7,6 +7,7 @@ This project demonstrates the implementation of security using Spring Boot 3.0 a
 * Role-based authorization with Spring Security
 * Customized access denied handling
 * Logout mechanism
+* Refresh token
 
 ## Technologies
 * Spring Boot 3.0
