@@ -1,6 +1,5 @@
 package com.alibou.security.config;
 
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +20,7 @@ public class SecurityConfiguration {
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final AuthenticationProvider authenticationProvider;
   private final LogoutHandler logoutHandler;
+  public static final String[] whiteListedRoutes = new String[]{"/api/v1/auth/**"};
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,7 +28,7 @@ public class SecurityConfiguration {
         .csrf()
         .disable()
         .authorizeHttpRequests()
-        .requestMatchers("/api/v1/auth/**")
+        .requestMatchers(whiteListedRoutes)
           .permitAll()
         .anyRequest()
           .authenticated()
