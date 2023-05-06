@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.util.AntPathMatcher;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
   private final TokenRepository tokenRepository;
+
+  private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
   @Override
   protected void doFilterInternal(
@@ -42,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String userEmail;
 
     if(
-        Arrays.asList(SecurityConfiguration.whiteListedRoutes).contains(request.getServletPath()) ||
+        Arrays.stream(SecurityConfiguration.whiteListedRoutes).anyMatch(route -> antPathMatcher.match(route, req.getServletPath())) ||
         authHeader == null ||
         !authHeader.startsWith("Bearer ")
     ) {
