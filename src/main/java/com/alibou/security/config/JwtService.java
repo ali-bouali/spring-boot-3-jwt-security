@@ -82,13 +82,13 @@ public class JwtService {
   private Claims extractAllClaims(String token) {
     return Jwts
         .parserBuilder()
-        .setSigningKey(getSignInKey())
+        .setSigningKey(getSigningKey())
         .build()
         .parseClaimsJws(token)
         .getBody();
   }
 
-  private Key getSignInKey() {
+  private Key getSigningKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
   }
