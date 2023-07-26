@@ -18,5 +18,5 @@ public enum Permission {
     ;
 
     @Getter
-    private final String permission;
+    private final String permissionStr;
 }

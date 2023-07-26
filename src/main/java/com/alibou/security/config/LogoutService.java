@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
@@ -23,13 +25,13 @@ public class LogoutService implements LogoutHandler {
   ) {
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+    if (Objects.isNull(authHeader) || !authHeader.startsWith("Bearer ")) {
       return;
     }
     jwt = authHeader.substring(7);
-    var storedToken = tokenRepository.findByToken(jwt)
+    var storedToken = tokenRepository.findByTokenCode(jwt)
         .orElse(null);
-    if (storedToken != null) {
+    if (Objects.nonNull(storedToken)) {
       storedToken.setExpired(true);
       storedToken.setRevoked(true);
       tokenRepository.save(storedToken);
