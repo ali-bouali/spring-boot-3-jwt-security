@@ -33,18 +33,18 @@ public class ManagementController {
     )
     @GetMapping
     public String get() {
-        return "GET:: management controller";
+        return "GET:: client controller";
     }
     @PostMapping
     public String post() {
-        return "POST:: management controller";
+        return "POST:: client controller";
     }
     @PutMapping
     public String put() {
-        return "PUT:: management controller";
+        return "PUT:: client controller";
     }
     @DeleteMapping
     public String delete() {
-        return "DELETE:: management controller";
+        return "DELETE:: client controller";
     }
 }
