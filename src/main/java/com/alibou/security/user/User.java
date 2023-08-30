@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -29,9 +30,17 @@ public class User implements UserDetails {
   @Id
   @GeneratedValue
   private Integer id;
+
+  @Column(nullable = false)
   private String firstname;
+
+  @Column(nullable = false)
   private String lastname;
+
+  @Column(nullable = false, unique = true)
   private String email;
+
+  @Column(nullable = false)
   private String password;
 
   @Enumerated(EnumType.STRING)
