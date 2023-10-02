@@ -1,11 +1,9 @@
 package com.alibou.security.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -13,9 +11,9 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
-    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+    public void changePassword(ChangePasswordRequest request, Authentication authentication) {
 
-        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        var user = (User) authentication.getPrincipal();
 
         // check if the current password is correct
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
