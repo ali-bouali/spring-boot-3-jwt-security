@@ -1,0 +1,44 @@
+### Register User
+POST http://localhost:8080/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstname": "Ali",
+  "lastname": "Bouali",
+  "email":  "alibou@mail.com",
+  "password": "password",
+  "role":  "ADMIN"
+}
+
+> {% client.global.set("auth-token", response.body.access_token);  %}
+
+
+###Create a new book
+POST http://localhost:8080/api/v1/books
+Authorization: Bearer {{auth-token}}
+Content-Type: application/json
+
+{
+  "author": "Alibou",
+  "isbn": "12345"
+}
+
+### Query Books
+GET http://localhost:8080/api/v1/books
+Authorization: Bearer {{auth-token}}
+
+### Update one book
+POST http://localhost:8080/api/v1/books
+Authorization: Bearer {{auth-token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "author": "Alibou 2",
+  "isbn": "12345"
+}
+
+
+### Query the Books one more time
+GET http://localhost:8080/api/v1/books
+Authorization: Bearer {{auth-token}}
