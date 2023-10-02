@@ -1,26 +1,18 @@
 package com.alibou.security.auth;
 
 import com.alibou.security.config.JwtService;
+import com.alibou.security.exception.InvalidAuthTokenException;
+import com.alibou.security.exception.UserNotFoundForAuthException;
 import com.alibou.security.token.Token;
 import com.alibou.security.token.TokenRepository;
 import com.alibou.security.token.TokenType;
-import com.alibou.security.user.Role;
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -90,17 +82,12 @@ public class AuthenticationService {
     tokenRepository.saveAll(validUserTokens);
   }
 
-  public void refreshToken(
-          HttpServletRequest request,
-          HttpServletResponse response
-  ) throws IOException {
-    final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    final String refreshToken;
+  public AuthenticationResponse refreshToken(String refreshToken) {
     final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-      return;
+    if (refreshToken == null ||!refreshToken.startsWith("Bearer ")) {
+      throw new InvalidAuthTokenException("Invalid refresh token");
     }
-    refreshToken = authHeader.substring(7);
+    refreshToken = refreshToken.substring(7);
     userEmail = jwtService.extractUsername(refreshToken);
     if (userEmail != null) {
       var user = this.repository.findByEmail(userEmail)
@@ -109,12 +96,15 @@ public class AuthenticationService {
         var accessToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
-        var authResponse = AuthenticationResponse.builder()
+        return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+      } else {
+        throw new InvalidAuthTokenException("Invalid refresh token");
       }
+    } else {
+      throw new UserNotFoundForAuthException("User for token not found");
     }
   }
 }
