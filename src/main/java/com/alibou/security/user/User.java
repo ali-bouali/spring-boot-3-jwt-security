@@ -1,6 +1,7 @@
 package com.alibou.security.user;
 
 import com.alibou.security.token.Token;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,6 +32,7 @@ public class User implements UserDetails {
   private Integer id;
   private String firstname;
   private String lastname;
+  @Column(unique = true)
   private String email;
   private String password;
 
