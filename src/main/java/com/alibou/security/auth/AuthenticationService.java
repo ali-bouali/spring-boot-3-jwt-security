@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +34,25 @@ public class AuthenticationService {
 
   public AuthenticationResponse register(RegisterRequest request) {
     // Check if the given user exists in database
-    boolean isPresent = repository.findByEmail(request.getEmail()).isPresent();
-    var user = isPresent
-            ? repository.findByEmail(request.getEmail()).get()
-            : User.builder()
-            .firstname(request.getFirstname())
-            .lastname(request.getLastname())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(request.getRole())
-            .build();
-    var savedUser = isPresent ? user : repository.save(user);
+    Optional<User> userOptional = repository.findByEmail(request.getEmail());
+    User user;
+
+    if(userOptional.isPresent()) {
+      user = userOptional.get();
+    } else {
+      user = User.builder()
+              .firstname(request.getFirstname())
+              .lastname(request.getLastname())
+              .email(request.getEmail())
+              .password(passwordEncoder.encode(request.getPassword()))
+              .role(request.getRole())
+              .build();
+      repository.save(user);
+    }
+
     var jwtToken = jwtService.generateToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
-    saveUserToken(savedUser, jwtToken);
+    saveUserToken(user, jwtToken);
     return AuthenticationResponse.builder()
         .accessToken(jwtToken)
             .refreshToken(refreshToken)
