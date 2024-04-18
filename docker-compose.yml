@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
+      POSTGRES_DB: jwt_security
     volumes:
       - postgres:/data/postgres
     ports:
@@ -28,6 +29,23 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+  springboot:
+    networks:
+        - postgres
+    build:
+      dockerfile: Dockerfile
+    image: springboot:jwt
+    container_name: sb3jwt
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_started
+    links:
+      - postgres
 
 networks:
   postgres:
