@@ -4,6 +4,8 @@ import com.alibou.security.auditing.ApplicationAuditAware;
 import com.alibou.security.user.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -15,10 +17,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationConfig {
+public class ApplicationConfig implements BeanPostProcessor {
 
   private final UserRepository repository;
 
@@ -49,6 +52,14 @@ public class ApplicationConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Override
+  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    if (bean instanceof AuthorizationFilter authorizationFilter) {
+      authorizationFilter.setFilterErrorDispatch(false);
+    }
+    return bean;
   }
 
 }
