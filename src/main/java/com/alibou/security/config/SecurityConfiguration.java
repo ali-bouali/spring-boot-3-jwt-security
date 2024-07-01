@@ -13,20 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.alibou.security.user.Permission.ADMIN_CREATE;
-import static com.alibou.security.user.Permission.ADMIN_DELETE;
-import static com.alibou.security.user.Permission.ADMIN_READ;
-import static com.alibou.security.user.Permission.ADMIN_UPDATE;
-import static com.alibou.security.user.Permission.MANAGER_CREATE;
-import static com.alibou.security.user.Permission.MANAGER_DELETE;
-import static com.alibou.security.user.Permission.MANAGER_READ;
-import static com.alibou.security.user.Permission.MANAGER_UPDATE;
+import static com.alibou.security.user.Permission.*;
 import static com.alibou.security.user.Role.ADMIN;
 import static com.alibou.security.user.Role.MANAGER;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -45,10 +35,15 @@ public class SecurityConfiguration {
             "/configuration/security",
             "/swagger-ui/**",
             "/webjars/**",
-            "/swagger-ui.html"};
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/api-docs/**",
+            "/"};
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,7 +68,9 @@ public class SecurityConfiguration {
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 )
-        ;
+                .exceptionHandling(exception-> exception
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler));
 
         return http.build();
     }
